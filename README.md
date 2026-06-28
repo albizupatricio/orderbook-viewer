@@ -18,7 +18,7 @@ A real-time cryptocurrency orderbook built with Next.js, TypeScript, and WebSock
 
 ### Unit test coverage
 
-![Coverage](public/unit%20test%20-%20coverage.png)
+![Coverage](public/screenshot-coverage.png)
 
 ---
 
