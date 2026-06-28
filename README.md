@@ -390,6 +390,10 @@ Tests were written for several reasons beyond the challenge bonus requirement:
 - **Accessibility as a byproduct** — RTL queries like `getByRole` and `getByLabelText` fail if ARIA roles or labels are missing. Writing tests enforced correct semantics across every component.
 - **Refactor safety** — the WebSocket hook and utility functions are pure enough to test in isolation. Having tests means the data layer can be changed confidently without breaking the UI.
 
+#### Coverage
+
+The final coverage report shows **100% Statements (265/265), 100% Functions (75/75), and 100% Lines (242/242)**. Branch coverage is **93.15% (177/190)**.
+
 ---
 
 ## What I'd Improve
@@ -397,6 +401,35 @@ Tests were written for several reasons beyond the challenge bonus requirement:
 - **Incremental orderbook diff** — apply depth update deltas instead of replacing the full snapshot on every flush, reducing the rendering work per tick
 - **Accessible ticker search** — add keyboard navigation (arrow keys, Home/End) to the searchable select following the ARIA combobox pattern
 - **Dynamic top tickers** — rank the default pairs by `quoteVolume` from `GET /api/v3/ticker/24hr` so the list stays relevant without manual updates
+- **End-to-end tests** — see below
+
+### End-to-end tests (future)
+
+Unit tests cover components and hooks in isolation: a mocked WebSocket delivers fake data, components render with controlled props, and individual functions are tested against known inputs. What they cannot cover is the full integrated flow — whether the server component actually fetches tickers, whether the ticker selector opens and filters correctly in a real browser, whether switching pairs reconnects the WebSocket, or whether the connection status chip transitions correctly under real network conditions.
+
+End-to-end tests with **Playwright** would fill this gap. Each test would spin up the Next.js dev server, open a real browser, and interact with the app the same way a user would.
+
+The main challenge is the live WebSocket dependency — tests that hit `wss://stream.binance.com` are fragile in CI (network failures, rate limits, Binance downtime). Playwright 1.48+ solves this with `page.routeWebSocket()`, which intercepts WebSocket connections and lets you inject controlled payloads:
+
+```ts
+await page.routeWebSocket("wss://stream.binance.com*", (ws) => {
+  ws.onopen(() => {
+    ws.send(JSON.stringify({
+      lastUpdateId: 1,
+      bids: [["50000.00", "1.5"]],
+      asks: [["50001.00", "0.8"]],
+    }));
+  });
+});
+```
+
+With this in place, the core E2E scenarios would be:
+
+- Page loads → ticker selector is enabled → default pair is `BTC/USDT`
+- Connection status chip shows `Live` after WebSocket connects
+- Switching ticker → WebSocket reconnects → new pair name appears in the header
+- Toggling from 10 to 20 levels → table grows to 20 rows
+- Dismissing the error toast → toast disappears
 
 ## Known Issues
 
