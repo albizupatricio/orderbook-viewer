@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Frontend Challenge",
+  title: "Orderbook Viewer",
   description: "Real-time orderbook viewer powered by Binance",
 };
 

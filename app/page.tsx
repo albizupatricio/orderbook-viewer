@@ -10,7 +10,7 @@ export default function HomePage() {
   return (
     <main className="bg-black min-h-screen p-4 sm:p-8 overflow-y-auto">
       <h1 className="text-2xl font-semibold text-ov-default mb-6 pb-4">
-        Frontend Challenge
+        Orderbook Viewer
       </h1>
       <Suspense fallback={LOADING_FALLBACK}>
         <TickerLoader />
