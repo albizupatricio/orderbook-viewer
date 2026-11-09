@@ -1,5 +1,7 @@
 # Orderbook Viewer
 
+**Live demo:** https://albizupatricio.github.io/orderbook-viewer/
+
 A real-time cryptocurrency orderbook built with Next.js, TypeScript, and WebSocket. Displays live bid/ask levels for multiple trading pairs with a 2-second render throttle to prevent UI flicker.
 
 ---
@@ -97,6 +99,22 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
+## Deploy
+
+The live demo is published to GitHub Pages via [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml). It runs on every push to `main`, on manual dispatch, and on a weekly schedule, and does:
+
+```bash
+npm ci
+npm test
+GITHUB_PAGES=true npm run build   # static export to ./out
+```
+
+The `GITHUB_PAGES=true` flag switches `next.config.ts` from the Docker `standalone` output to `output: "export"` with `basePath: "/orderbook-viewer"`, so asset URLs resolve correctly under the project Pages subpath. The `./out` folder is then published with `actions/upload-pages-artifact` and `actions/deploy-pages`.
+
+Because it's a static export, the ticker list returned by `getTickersInfo()` is fetched once at build time and baked into the HTML — it does not refresh on page load. The weekly scheduled run exists specifically to rebuild and pick up any new or delisted trading pairs.
+
+---
+
 ## Architecture
 
 ### Folder structure
@@ -134,7 +152,7 @@ orderbook-viewer/
 │   └── framer-motion.tsx               # global Jest mock
 ├── Dockerfile
 ├── .dockerignore
-└── next.config.ts                      # standalone output for Docker
+└── next.config.ts                      # standalone output for Docker, static export for GitHub Pages
 ```
 
 UI components live under `UI/` and are intentionally generic — no orderbook-specific logic. Feature components live under `orderbook/` and can reference domain types freely. `hooks/`, `services/`, and `utils/` are kept separate to make the data layer independently testable without rendering anything.
@@ -191,6 +209,10 @@ The Binance `GET /api/v3/exchangeInfo` endpoint does not support filtering by qu
 The ideal ranking would use `GET /api/v3/ticker/24hr` to sort pairs by `quoteVolume` and always surface the most traded pairs. This was out of scope — the response includes every symbol and parsing/sorting it server-side adds complexity without enough benefit given that top pairs rarely change. Instead, 5 well-known pairs are hardcoded at the top and the rest are sorted alphabetically.
 
 On the client, a `SearchableSelect` component filters the list in memory as the user types — no additional API calls needed.
+
+#### `data-api.binance.vision` / `data-stream.binance.vision` instead of `api.binance.com` / `stream.binance.com`
+
+`api.binance.com` and `stream.binance.com` block requests from US-based IPs, which breaks both GitHub Actions runners (geographically in the US) and any visitor browsing from the US — including recruiters checking out the live demo. Binance publishes `data-api.binance.vision` and `data-stream.binance.vision` as unauthenticated, geo-unrestricted mirrors of the same public market data endpoints, with identical paths and query parameters, so swapping the base URL was a drop-in fix.
 
 #### SPOT filter on ticker fetch
 
