@@ -3,7 +3,7 @@ import WS from "jest-websocket-mock";
 import { ConnectionStatus } from "@/common-types/orderbook";
 import { useOrderbookStream } from "./useOrderbookStream";
 
-const MOCK_URL = "wss://stream.binance.com:9443/ws/btcusdt@depth10@1000ms";
+const MOCK_URL = "wss://data-stream.binance.vision/ws/btcusdt@depth10@1000ms";
 
 const MOCK_MESSAGE = {
   lastUpdateId: 123,

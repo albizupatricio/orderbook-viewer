@@ -41,13 +41,13 @@ const MOCK_SYMBOLS = [
 describe("buildStreamUrl", () => {
   it("builds correct URL with default params", () => {
     expect(buildStreamUrl("BTCUSDT")).toBe(
-      "wss://stream.binance.com:9443/ws/btcusdt@depth10@1000ms",
+      "wss://data-stream.binance.vision/ws/btcusdt@depth10@1000ms",
     );
   });
 
   it("builds correct URL with custom levels and interval", () => {
     expect(buildStreamUrl("ETHUSDT", 20, StreamInterval.Fast)).toBe(
-      "wss://stream.binance.com:9443/ws/ethusdt@depth20@100ms",
+      "wss://data-stream.binance.vision/ws/ethusdt@depth20@100ms",
     );
   });
 });

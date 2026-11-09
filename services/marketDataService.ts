@@ -1,8 +1,8 @@
 import { TickerInfo } from "@/common-types/orderbook";
 
-const BINANCE_WEB_SOCKET_BASE_URL = "wss://stream.binance.com:9443/ws";
+const BINANCE_WEB_SOCKET_BASE_URL = "wss://data-stream.binance.vision/ws";
 const BINANCE_EXCHANGE_INFO_URL =
-  "https://api.binance.com/api/v3/exchangeInfo?symbolStatus=TRADING&showPermissionSets=false&permissions=SPOT";
+  "https://data-api.binance.vision/api/v3/exchangeInfo?symbolStatus=TRADING&showPermissionSets=false&permissions=SPOT";
 
 const EXCHANGE_INFO_REVALIDATE_SECONDS = 86400;
 export const TOP_TICKERS: TickerInfo[] = [
